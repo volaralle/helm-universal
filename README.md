@@ -1,7 +1,7 @@
 - helm dependency build
-- helm upgrade --install aaa  ../helm-universal/ -f test.yaml 
+- helm upgrade --install release-name  ../helm-universal/ -f test.yaml 
 
-+
+and dont forget create this file:
 ```
 apiVersion: v1
 kind: Secret
