@@ -1,0 +1,25 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ required "Service name should be specified!" .Values.name }}
+  {{- with .Values.ingress.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  tls:
+    - hosts:
+      - {{ include "common.tplvalues.render" ( dict "value" .Values.ingress.host "context" $) }}.{{ include "common.tplvalues.render" ( dict "value" .Values.ingress.baseDomain "context" $) }}
+      secretName: {{ include "common.tplvalues.render" ( dict "value" .Values.ingress.tls.secretName "context" $) }}
+  rules:
+    - host: {{ include "common.tplvalues.render" ( dict "value" .Values.ingress.host "context" $) }}.{{ include "common.tplvalues.render" ( dict "value" .Values.ingress.baseDomain "context" $) }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.uriPrefix }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ required "Service name should be specified!" .Values.name }}
+                port:
+                  number: {{ required "Service port should be specified!" .Values.port }}
+{{- end }}

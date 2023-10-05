@@ -1,0 +1,67 @@
+name: 
+image: 
+  repository: image
+  tag: tag
+command: sleep
+args:
+  - infinity
+namespace: esmp
+port: 7062
+replicas: 1 
+migration: false
+ingress:
+  enabled: false
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+livenessProbe:
+readinessProbe:
+startupProbe:
+imagePullSecrets:
+  - name: 
+PersistentVolumeClaim:
+  enabled: false
+
+
+
+
+
+#livenessProbe:
+#  httpGet:
+#    path: /
+#    port: http
+#readinessProbe:
+#  httpGet:
+#    path: /
+#    port: http
+#startupProbe:
+#  httpGet:
+#    path: /
+#    port: http
+##  PersistentVolumeList:
+##    - name: pvc-test-rwm-first
+##      storageClassName: nfs
+##      storageCapacity: 5Gi
+##      accessModes: ReadWriteMany
+##      mountPath: /first
+##
+###    - name: pvc-test-rwm-second
+###      storageClassName: nfs
+###      storageCapacity: 15Gi
+###      accessModes: ReadWriteMany
+###      mountPath: /second
+##
+###    - name: pvc-test-rwm-third
+###      storageClassName: nfs
+###      storageCapacity: 1Gi
+###      accessModes: ReadWriteMany
+###      mountPath: /third
+
+###securityContext:
+###  runAsNonRoot: false
+###  runAsUser: 1000
+###  runAsGroup: 1000

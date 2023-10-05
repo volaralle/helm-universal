@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ required "Service name should be specified!" .Values.name }}
+  labels:
+    app: {{ required "Service name should be specified!" .Values.name }}
+  namespace: {{ required "\n\n\nWHICH NAMESPACE?\n\n\nWHERE BANANA?\n\n\n" .Values.namespace }}
+spec:
+  replicas: {{ required "Service replicas number should be specified!" .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ required "Service name should be specified!" .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ required "Service name should be specified!" .Values.name }}
+        {{- with .Values.gitCommit }}
+        git-commit: {{ . }}
+        {{- end }}
+    spec:
+      {{- with .Values.serviceAccount }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.migration }}
+      initContainers:
+        - name: migration
+          image: {{ required "Service image.repository should be specified!" .Values.image.repository }}:{{ required "Service image.tag should be specified!" .Values.image.tag }}
+          imagePullPolicy: Always
+          args: ["--migrate"]
+      {{- end }}
+      containers:
+        - name: {{ required "Service name should be specified!" .Values.name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          {{- if .Values.command }}
+          command: [ {{  .Values.command  }} ]
+          {{- end }}
+          {{- with .Values.args }} 
+          args:
+            {{- range . }}
+            - {{ include "common.tplvalues.render" ( dict "value" . "context" $) }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.PersistentVolumeClaim.enabled }}
+          volumeMounts:
+          {{- range .Values.PersistentVolumeClaim.PersistentVolumeList }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: {{ required "Service port should be specified!" .Values.port }}
+              name: service-port
+          {{- if .Values.extra_vars }}
+          env:
+            {{- range .Values.extra_vars }}
+            - name: {{ include "common.tplvalues.render" ( dict "value" .name "context" $) | quote }}
+              {{- if .secret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "common.tplvalues.render" ( dict "value" .secret "context" $) | quote }}
+                  key: {{ include "common.tplvalues.render" ( dict "value" .key "context" $) | quote }}
+              {{- else if .configmap }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "common.tplvalues.render" ( dict "value" .configmap "context" $) | quote }}
+                  key: {{ include "common.tplvalues.render" ( dict "value" .key "context" $) | quote }}
+              {{- else if .field }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: {{ include "common.tplvalues.render" ( dict "value" .field "context" $) | quote }}
+                  apiVersion: {{ .apiVersion | quote }}
+              {{- else }}
+              value: {{ include "common.tplvalues.render" ( dict "value" .value "context" $) | quote }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.resources }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.livenessProbe }}
+          livenessProbe: {{- toYaml .Values.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.readinessProbe }}
+          readinessProbe: {{- toYaml .Values.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.startupProbe }}
+          startupProbe: {{- toYaml .Values.startupProbe | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          #securityContext: {{- toYaml . | nindent 12 }}
+          #{{- end }}
+      {{- if .Values.PersistentVolumeClaim.enabled }}
+      volumes:
+      {{- range .Values.PersistentVolumeClaim.PersistentVolumeList }}
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .name }}
+      {{- end }}
+      {{- end }}

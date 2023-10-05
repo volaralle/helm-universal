@@ -1,0 +1,10 @@
+apiVersion: v2
+name: base
+version: "0.0.1"
+description: Base for project
+type: application
+maintainers:
+  - name: volaral
+    email: volaralle@gmail.com
+appVersion: "0.0.1"
+icon: https://helm.sh/img/helm.svg

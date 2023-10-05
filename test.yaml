@@ -1,0 +1,117 @@
+service-1:
+  name: service-1
+  image: 
+    repository: debian
+    tag: latest
+  command: sleep
+  args:
+    - infinity
+  namespace: default
+  port: 5000
+  replicas: 1 
+  migration: false
+  ingress:
+    enabled: false
+  PersistentVolumeClaim:
+    enabled: false
+  imagePullSecrets:
+    - name: registry-secret
+
+service-2:
+  name: service-2
+  image: 
+    repository: alpine
+    tag: latest
+  command: sleep
+  args:
+    - infinity
+  namespace: default
+  port: 10500
+  replicas: 1 
+  migration: false
+  ingress:
+    enabled: false
+  PersistentVolumeClaim:
+    enabled: false
+  imagePullSecrets:
+    - name: registry-secret
+
+
+redis:
+  fullnameOverride: redis
+  architecture: standalone
+  
+postgresql:
+  fullnameOverride: postgres-demo
+  auth:
+    postgresPassword: postgres
+    username: user
+    password: passwd
+    database: db
+  primary:
+    persistence:
+      size: 1Gi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+#  httpGet:
+#    path: /
+#    port: http
+#  httpGet:
+#    path: /
+#    port: http
+#  httpGet:
+#    path: /
+#    port: http
+
+
+
+
+##  PersistentVolumeList:
+##    - name: pvc-test-rwm-first
+##      storageClassName: nfs
+##      storageCapacity: 5Gi
+##      accessModes: ReadWriteMany
+##      mountPath: /first
+##
+###    - name: pvc-test-rwm-second
+###      storageClassName: nfs
+###      storageCapacity: 15Gi
+###      accessModes: ReadWriteMany
+###      mountPath: /second
+##
+###    - name: pvc-test-rwm-third
+###      storageClassName: nfs
+###      storageCapacity: 1Gi
+###      accessModes: ReadWriteMany
+###      mountPath: /third
+
+###securityContext:
+###  runAsNonRoot: false
+###  runAsUser: 1000
+###  runAsGroup: 1000

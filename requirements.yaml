@@ -1,0 +1,17 @@
+dependencies:
+  - name: base-service
+    repository: file://./charts/base-service
+    version: 0.0.1
+    alias: service-1
+  - name: base-service
+    repository: file://./charts/base-service
+    version: 0.0.1
+    alias: service-2
+  - name: redis
+    version: 18.1.2
+    repository: https://charts.bitnami.com/bitnami
+    alias: redis
+  - name: postgresql
+    repository: https://charts.bitnami.com/bitnami
+    version: 13.1.0
+    alias: postgresql

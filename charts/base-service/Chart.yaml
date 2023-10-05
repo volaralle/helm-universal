@@ -1,0 +1,11 @@
+apiVersion: v2
+name: base-service
+version: "0.0.1"
+description: Base for project
+type: application
+appVersion: "0.0.1"
+icon: https://helm.sh/img/helm.svg
+dependencies:
+  - name: common
+    repository: file://./charts/common
+    version: 1.13.1
